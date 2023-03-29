@@ -16,7 +16,7 @@ Simply type your event details into a block that corresponds with the time and p
 
 
 ## Deployed Link
-
+https://savannahmunn1996.github.io/Time-To-Grind/
 
 ## Contact
 Savannah Mercedes is a Software developer with a passion for education and technology. Email: savannahmunn1996@gmail.com
