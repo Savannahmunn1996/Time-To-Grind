@@ -20,8 +20,9 @@ $(function () {
   // attribute of each time-block be used to do this?
   //
   // TODO: Add code to display the current date in the header of the page.
+
   var now = dayjs();
-  console.log(now);
+  let hour = dayjs().hour();
 
   $("#current-Day").text(now)
 
@@ -31,12 +32,34 @@ $(function () {
   });
 });
 
+// save button functionality
+$(".saveBtn").click(function () {
+  // get plans from localstorage
+  var localPlans = getPlan();
+  // grab the container associated with the specific save button
+  var container = $(this).closest('.time-block');
+  // grab the id from the time-block container
+  var id = container.attr('id');
+  // attach the id to the text to be saved
+  var plan = id + container.find('.description').val();
+  // push the text to be saved to our plans array
+  localPlans.push(plan);
+  // save the array to localstorage
+  localStorage.setItem('plans', JSON.stringify(localPlans));
+  console.log(localPlans);
+});
 
-// $("saveBtn").click(function () {
-//   this.description = text;
-//   localStorage.setItem("plans", ${this.description});
-//   localStorage.getItem("plans");
-// });
+function getPlan() {
+  var plans = localStorage.getItem('plans');
+  if(plans) {
+    plans = JSON.parse(plans);
+  } else {
+    plans = [];
+  }
+  return plans;
+}
+
+
 
 
 
@@ -58,3 +81,54 @@ $(function () {
 //     localStorage.setItem("inputDate", currentDate);
 //   });
 // });
+
+
+let block = $(".time-block");
+let blockHour = $(".hour").text().charAt(0);
+
+// for each time block
+$(".time-block").each(function() {
+  // get the plans from localstorage
+  var localPlans = getPlan();
+  // for each plan in localstorage
+  for(var i = 0; i < localPlans.length; i++) {
+    // grab its id (ex: 'hour-4')
+    var match = localPlans[i].match(/hour-[1-9]/);
+    // if a plans' id matches our time-blocks id
+    if(match[0].toString() == $(this).attr('id').toString()) {
+      // set the text in our time-block to that plan
+      $(this).find('.description').val(localPlans[i].substring(6, localPlans[i].length));
+    }
+  }
+
+  // set each timeblocks color
+  var hourText = $(this).find('.hour').text();
+  // get the time of each block into military time
+  var timeHour = toMilitaryTime(hourText);
+  // get the current hour
+  var hour = dayjs().hour();
+
+  // give each timeblock its appropriate time
+  if(timeHour < hour) {
+    $(this).addClass('past');
+  } else if(timeHour == hour) {
+    $(this).addClass('present');
+  } else if(timeHour > hour){
+    $(this).addClass('future');
+  }
+
+})
+
+// function to turn text like '4PM' to military time
+function toMilitaryTime(time) {
+  var hour = parseInt(time, 10);
+  var isPM = time.indexOf('pm') > -1 || time.indexOf('PM') > -1;
+  
+  if (hour === 12 && !isPM) {
+    hour = 0;
+  } else if (isPM) {
+    hour += 12;
+  }
+
+  return hour;
+}
